@@ -1,8 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
-<<meta name="google-site-verification" content="SlB3G-qxfZqI5vMGtdhp2dEaopWKqimlUeI0tFNpis0" />>
+<head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Google Verification Tag -->
+<meta name="google-site-verification" content="SlB3G-qxfZqI5vMGtdhp2dEaopWKqimlUeI0tFNpis0" />
+
 <title>Aslam Suit Store</title>
 
 <style>
@@ -12,92 +17,7 @@ body{
     background:#f5f5f5;
 }
 
-header{
-    background:black;
-    color:white;
-    text-align:center;
-    padding:15px;
-}
-
-/* FORM */
-.form-box{
-    background:white;
-    margin:20px;
-    padding:15px;
-    border-radius:10px;
-}
-
-input{
-    width:100%;
-    padding:8px;
-    margin:5px 0;
-}
-
-/* PRODUCTS */
-.products{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-    gap:15px;
-    padding:20px;
-}
-
-.card{
-    background:white;
-    border-radius:10px;
-    overflow:hidden;
-}
-
-.card img{
-    width:100%;
-    height:250px;
-    object-fit:cover;
-    cursor:pointer;
-}
-
-.card-content{
-    padding:10px;
-    text-align:center;
-}
-
-button{
-    background:black;
-    color:white;
-    padding:8px;
-    border:none;
-    cursor:pointer;
-    width:100%;
-    margin-top:5px;
-}
-
-.remove{
-    background:red;
-}
-
-/* CART */
-.cart-box{
-    background:white;
-    margin:20px;
-    padding:15px;
-    border-radius:10px;
-}
-
-/* POPUP */
-.popup{
-    display:none;
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:rgba(0,0,0,0.9);
-    justify-content:center;
-    align-items:center;
-}
-
-.popup img{
-    max-width:90%;
-    max-height:90%;
-}
+/* (rest of your CSS same रहेगा) */
 </style>
 
 </head>
@@ -108,145 +28,7 @@ button{
     <h1>ASLAM Suit Store</h1>
 </header>
 
-<!-- ADD PRODUCT -->
-<div class="form-box">
-    <h2>➕ Add Product</h2>
-
-    <input type="text" id="name" placeholder="Product Name">
-    <input type="number" id="price" placeholder="Price">
-    <input type="file" id="image" accept="image/*">
-
-    <button onclick="addProduct()">Add Product</button>
-</div>
-
-<!-- PRODUCTS -->
-<div class="products" id="product-list"></div>
-
-<!-- CART -->
-<div class="cart-box">
-    <h2>🛒 Cart</h2>
-    <ul id="cart-list"></ul>
-    <h3 id="total">Total: ₹0</h3>
-
-    <button onclick="whatsappOrder()">📲 WhatsApp Order</button>
-    <button onclick="upiPay()">💳 Pay via UPI</button>
-</div>
-
-<!-- IMAGE POPUP -->
-<div class="popup" id="popup" onclick="closePopup()">
-    <img id="popup-img">
-</div>
-
-<script>
-
-let products = JSON.parse(localStorage.getItem("products")) || [];
-let cart = [];
-let total = 0;
-
-/* SHOW PRODUCTS */
-function showProducts(){
-    let list = document.getElementById("product-list");
-    list.innerHTML="";
-
-    products.forEach((p,index)=>{
-        list.innerHTML += `
-        <div class="card">
-            <img src="${p.image}" onclick="openImage('${p.image}')">
-            <div class="card-content">
-                <h3>${p.name}</h3>
-                <p>₹${p.price}</p>
-
-                <button onclick="addToCart('${p.name}',${p.price})">Add to Cart</button>
-                <button class="remove" onclick="deleteProduct(${index})">Delete</button>
-            </div>
-        </div>
-        `;
-    });
-}
-
-/* ADD PRODUCT */
-function addProduct(){
-    let name=document.getElementById("name").value;
-    let price=document.getElementById("price").value;
-    let file=document.getElementById("image").files[0];
-
-    let reader=new FileReader();
-
-    reader.onload=function(){
-        products.push({
-            name:name,
-            price:price,
-            image:reader.result
-        });
-
-        localStorage.setItem("products",JSON.stringify(products));
-        showProducts();
-    }
-
-    reader.readAsDataURL(file);
-}
-
-/* DELETE PRODUCT */
-function deleteProduct(index){
-    products.splice(index,1);
-    localStorage.setItem("products",JSON.stringify(products));
-    showProducts();
-}
-
-/* CART */
-function addToCart(name,price){
-    cart.push({name,price});
-    total+=price;
-    updateCart();
-}
-
-function updateCart(){
-    let list=document.getElementById("cart-list");
-    list.innerHTML="";
-
-    cart.forEach(item=>{
-        list.innerHTML+=`<li>${item.name} - ₹${item.price}</li>`;
-    });
-
-    document.getElementById("total").innerText="Total: ₹"+total;
-}
-
-/* WHATSAPP ORDER */
-function whatsappOrder(){
-    let msg="Order Details:%0A";
-
-    cart.forEach(i=>{
-        msg+=i.name+" - ₹"+i.price+"%0A";
-    });
-
-    msg+="Total: ₹"+total;
-
-    let phone="8950101781"; // अपना नंबर डालो
-
-    window.open("https://wa.me/"+phone+"?text="+msg);
-}
-
-/* UPI PAYMENT */
-function upiPay(){
-    let upiId="yourupi@upi"; // अपना UPI डालो
-    let url=`upi://pay?pa=${upiId}&pn=RoyalStore&am=${total}&cu=INR`;
-
-    window.open(url);
-}
-
-/* IMAGE VIEW */
-function openImage(src){
-    document.getElementById("popup-img").src=src;
-    document.getElementById("popup").style.display="flex";
-}
-
-function closePopup(){
-    document.getElementById("popup").style.display="none";
-}
-
-showProducts();
-
-</script>
+<!-- (rest of your full code same as before) -->
 
 </body>
 </html>
